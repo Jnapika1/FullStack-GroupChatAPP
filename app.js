@@ -9,7 +9,10 @@ const app = express();
 
 app.use(bodyParser.json({ extended: false }));
 app.use(express.static(path.join(__dirname, 'views')));
-app.use(cors());
+app.use(cors({
+    origin: "*",
+    // methods: ['GET', 'POST']
+}));
 app.use(userRoutes);
 
 sequelize.sync()
