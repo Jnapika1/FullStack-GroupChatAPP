@@ -29,5 +29,49 @@
         <input type="password" name="password" id="password" class="form-control">
         <button type="submit" class="btn btn-success">Sign up</button>
     </form>
+    <p id="msg"></p>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+    <script>
+        const myForm = document.getElementById('signup_form');
+        const name = document.getElementById('name');
+        const email = document.getElementById('email');
+        const phone = document.getElementById('phone');
+        const password = document.getElementById('password');
+
+        const p = document.getElementById('msg');
+
+        myForm.addEventListener('submit', onSubmit);
+        
+        function onSubmit(e){
+            e.preventDefault();
+            if(name.value==='' || email.value==='' || password.value=== '' || phone.value===''){
+                alert('Enter the values!');
+            }
+            else{
+                let myObj = {
+                    name:name.value,
+                    email:email.value,
+                    phone: phone.value,
+                    password:password.value
+                }
+                // console.log(myObj);
+                
+                axios.post('http://localhost:3000/user/signup', myObj)
+                .then(response=>{
+                    p.style.color='green';
+                    p.textContent=`${response.data.message}`;
+                    // window.location.replace('../views/login.html');
+                    // console.log(response);
+                })
+                .catch((err)=>{
+                    // console.log(err);
+                    console.log(err.response.data.message);
+                    p.style.color='red';
+                    p.textContent=`${err.response.data.message}`;
+                });
+            }       
+        }
+
+    </script>
 </body>
 </html>
