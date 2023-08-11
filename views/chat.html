@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        #form-div{
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            padding: 1.5% 0;
+            background-color: rgb(16, 49, 78);
+        }
+        form{
+            display: flex;
+            justify-content: center;
+        }
+        input{
+            width: 40%;
+            border: 0;
+            border-radius: 5px;
+        }
+        p{
+            background-color: rgb(212, 212, 212);
+            margin: 0 20%;
+            padding: 0.5% 2%;
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h3  class="text-center">Chat App</h3>
+        <p>You joined</p>
+    </div>
+    <div class="rounded-top" id="form-div">
+        <form>
+            <input type="text" placeholder="Enter message" class="border border-primary" >
+            <button class="btn btn-sm btn-secondary">Send</button>
+        </form>
+    </div>
+</body>
+</html>
