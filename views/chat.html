@@ -36,7 +36,10 @@
 <body>
     <div>
         <h3  class="text-center">Chat App</h3>
-        <p>You joined</p>
+        <div id="chat-div">
+            <p>You joined</p>
+        </div>
+        
     </div>
     <div class="rounded-top" id="form-div">
         <form id="chat-form">
@@ -49,7 +52,26 @@
     <script>
         const chatForm = document.getElementById('chat-form');
         const message = document.getElementById('message');
+        const chatDiv = document.getElementById('chat-div');
         const token = localStorage.getItem('tokenKey');
+
+        window.addEventListener('DOMContentLoaded', ()=>{
+            axios.get('http://localhost:3000/user/getchats')
+            .then(response=>{
+                let chats = response.data.allChats;
+                chats.forEach(chat => {
+                    let p = document.createElement('p');
+                    p.appendChild(document.createTextNode(chat));
+                    chatDiv.appendChild(p);
+                    
+                });
+                console.log(response.data.allChats);
+
+            })
+            .catch(err=>{
+                console.log(err);
+            })
+        })
 
         chatForm.addEventListener('submit', onSubmit);
 
@@ -66,7 +88,9 @@
             axios.post('http://localhost:3000/user/chat', obj, {headers: {"Authorization": token}})
             .then(response=>{
                 console.log(response);
-                alert(response.data.message);
+                location.reload();
+                // alert(response.data.message);
+               
             })
             .catch(err=>{
                 console.log(err);
