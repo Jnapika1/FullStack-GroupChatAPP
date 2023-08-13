@@ -15,7 +15,7 @@ exports.postUserChats = async(req, res)=>{
         res.status(201).json({success: true, message: "chat stored successfully!"});
     }
     catch(err){
-        console.log(err);
+        // console.log(err);
         res.status(500).json({success:false, error:err});
     }
 }
@@ -27,11 +27,11 @@ exports.getChats = async(req, res)=>{
         chats.forEach(chat => {
             messages.push(chat.message);
         });
-        console.log(messages);
+        // console.log(messages);
         res.status(201).json({success: true, allChats: messages})
     }
     catch(err){
-        console.log(err);
+        // console.log(err);
         res.status(500).json({success:false, error:err});
     }
 }
