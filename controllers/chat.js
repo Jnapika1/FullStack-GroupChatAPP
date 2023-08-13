@@ -1,4 +1,4 @@
-const { where } = require('sequelize');
+const { where, Op } = require('sequelize');
 const Chat = require('../models/chats');
 const User = require('../models/userdetails');
 
@@ -22,13 +22,14 @@ exports.postUserChats = async(req, res)=>{
 
 exports.getChats = async(req, res)=>{
     try{
-        const chats = await Chat.findAll();
-        let messages=[];
-        chats.forEach(chat => {
-            messages.push(chat.message);
-        });
-        // console.log(messages);
-        res.status(201).json({success: true, allChats: messages})
+        const lastChatId = req.query.lastchatid;
+        const chats = await Chat.findAll({where:{id:{[Op.gt]:lastChatId}}});
+        // let messages=[];
+        // chats.forEach(chat => {
+        //     messages.push(chat.message);
+        // });
+        console.log(chats);
+        res.status(201).json({success: true, allChats: chats})
     }
     catch(err){
         // console.log(err);

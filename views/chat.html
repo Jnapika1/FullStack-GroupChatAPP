@@ -54,18 +54,51 @@
         const message = document.getElementById('message');
         const chatDiv = document.getElementById('chat-div');
         const token = localStorage.getItem('tokenKey');
+        let oldchats = localStorage.getItem('oldchats');
 
 
-        window.addEventListener('DOMContentLoaded', ()=>{
-            axios.get('http://localhost:3000/user/getchats')
-            .then(response=>{
-                let chats = response.data.allChats;
-                chats.forEach(chat => {
-                    let p = document.createElement('p');
-                    p.appendChild(document.createTextNode(chat));
-                    chatDiv.appendChild(p);
-                    
+        window.addEventListener('DOMContentLoaded', async()=>{
+            let oldchatsArray, lastChatId;
+
+            if(oldchats===null){
+                lastChatId=-1;
+            }
+            else{
+                oldchatsArray = JSON.parse(oldchats);
+                lastChatId = (oldchatsArray[oldchatsArray.length-1]).id;
+
+                await oldchatsArray.forEach(chat => {
+                let p = document.createElement('p');
+                p.appendChild(document.createTextNode(chat.message));
+                chatDiv.appendChild(p);
                 });
+            }
+            
+
+            
+            axios.get(`http://localhost:3000/user/getchats?lastchatid=${lastChatId}`)
+            .then(response=>{
+                
+                let chats = response.data.allChats;
+                // chats.forEach(chat => {
+                //     let p = document.createElement('p');
+                //     p.appendChild(document.createTextNode(chat));
+                //     chatDiv.appendChild(p);
+                    
+                // });
+                // console.log(oldchats);
+                if(oldchats!==null||undefined){
+                    oldchatsArray = JSON.parse(oldchats);
+                    chats.forEach(chat=>{
+                        oldchatsArray.push(chat);
+                    });
+                    oldchats=JSON.stringify(oldchatsArray);
+                }
+                else{
+                    oldchats=JSON.stringify(chats)
+                }
+                localStorage.setItem('oldchats', oldchats);
+                
                 console.log(response.data.allChats);
 
             })
