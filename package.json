@@ -7,6 +7,7 @@
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.1",
     "mysql2": "^3.6.0",
+    "nodemon": "^3.0.1",
     "sequelize": "^6.32.1"
   },
   "name": "chatapp",
@@ -14,7 +15,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "nodemon app.js"
   },
   "author": "Aishwarya",
   "license": "ISC",

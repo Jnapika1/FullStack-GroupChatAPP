@@ -55,8 +55,9 @@
                 .post('http://localhost:3000/user/login', myObj)
                 .then(response=>{
                     alert(`${response.data.message}`);
-                    console.log(response.data);
+                    // console.log(response.data);
                     localStorage.setItem('tokenKey', response.data.token);
+                    window.location.replace('./chat.html');
                 })
                 .catch((err)=>{ 
                     p.style.color='red';
