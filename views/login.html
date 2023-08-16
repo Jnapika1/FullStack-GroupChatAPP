@@ -57,7 +57,7 @@
                     alert(`${response.data.message}`);
                     // console.log(response.data);
                     localStorage.setItem('tokenKey', response.data.token);
-                    window.location.replace('./chat.html');
+                    window.location.replace('./showgroups.html');
                 })
                 .catch((err)=>{ 
                     p.style.color='red';

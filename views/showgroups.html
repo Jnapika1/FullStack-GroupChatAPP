@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groups</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        html, body{
+            margin: 0%;
+            height: 100%;
+        }
+        .group{
+            padding: 4% 0;
+            
+        }
+        #groups{
+            width: 30%;
+            float: left;
+            padding: 2% 2%;
+            height: 100%;
+        }
+        #groupchat-div{
+            padding: 2% 2%;
+            border-left: 2px solid rgb(196, 196, 196);
+            height: 100%;
+        }
+        #form-div{
+            position:fixed;
+            bottom: 0;
+            right: 0;
+            width: 70%;
+            padding: 1% 0;
+            background-color: rgb(16, 49, 78);
+        }
+        form{
+            display: flex;
+            justify-content: center;
+        }
+        input{
+            width: 40%;
+            border: 0;
+            border-radius: 5px;
+        }
+        p{
+            background-color: rgb(216, 216, 216);
+            border: 2px solid white;
+            margin: 0 20%;
+            padding: 0.5% 2%;
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+        }
+        /* .groupchats{
+            visibility: hidden;
+        } */
+    </style>
+</head>
+<body>
+
+    <div id="groups">
+        <h3 style="display: inline-block;">Groups</h3>
+        <a href="./creategroup.html"><button id="create-group" class="btn btn-sm btn-success" style="float: right;">Create Group</button></a>
+
+    </div>
+
+    <div style="width: 70%; float: right;" id="groupchat-div">
+        <h3 id="gc-h3" class="text-center">Group Chat</h3>
+        <div id="chat-div">  
+
+        </div>
+
+        <div class="rounded-top" id="form-div">
+            <form id="chat-form">
+                <input type="text" placeholder="Enter message" id="message" class="border border-primary" >
+                <button type="submit" class="btn btn-sm btn-secondary" id="newchatBtn">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js" crossorigin="anonymous" ></script>
+    <script>
+        const token= localStorage.getItem('tokenKey')
+        const groupsDiv = document.getElementById('groups');
+        const groupdiv = document.getElementById('groupchat-div');
+        const chatDiv = document.getElementById('chat-div');
+        const chatForm = document.getElementById('chat-form');
+        const newChatBtn = document.getElementById('newchatBtn');
+        const newMessage = document.getElementById('message');
+
+        window.addEventListener('DOMContentLoaded', ()=>{
+            axios.get('http://localhost:3000/user/getgroups', {headers: {"Authorization": token}})
+            .then(response=>{
+                console.log(response.data.groups);
+                let groups = response.data.groups;
+                groups.forEach(group => {
+                    const div = document.createElement('div');
+                    div.appendChild(document.createTextNode(`${group.name}`));
+                    div.className="group border-bottom"
+                    div.style="cursor: pointer;"
+                    div.value=group.id;
+                    groupsDiv.appendChild(div);
+                    div.setAttribute("onclick", `getChats(${group.id})`);
+                    // div.onclick=getChats(div);
+                    // div.addEventListener('click', getChats(group.id));
+
+                });
+            })
+            .catch(err=>{
+                console.log(err);
+            })
+        })
+
+        async function getChats(groupId){
+
+            chatDiv.innerHTML="";
+            newChatBtn.value=groupId;
+
+            let groupchatsArray, lastChatId;
+            let groupchats = localStorage.getItem(`groupchats${groupId}`);
+
+            if(groupchats===null){
+                lastChatId=-1;
+            }
+            else{
+                groupchatsArray = JSON.parse(groupchats);
+                lastChatId = (groupchatsArray[groupchatsArray.length-1]).id;
+                await groupchatsArray.forEach(chat => {
+                let p = document.createElement('p');
+                p.appendChild(document.createTextNode(chat.message));
+                chatDiv.appendChild(p);
+                });    
+            }
+
+            setInterval(()=>{
+                if(groupchats===null){
+                    lastChatId=-1;
+                }
+                else{
+                    groupchatsArray = JSON.parse(groupchats);
+                    lastChatId = (groupchatsArray[groupchatsArray.length-1]).id;    
+                }
+
+            // console.log(groupdiv);
+            axios.get(`http://localhost:3000/group/getchats?groupid=${groupId}&lastchatid=${lastChatId}`, {headers: {"Authorization": token}})
+            .then(response=>{
+                // console.log(response);
+                let chats = response.data.groupChats;
+                    if(chats.length!==0){
+                        chats.forEach(chat => {
+                        let p = document.createElement('p');
+                        p.appendChild(document.createTextNode(chat.message));
+                        chatDiv.appendChild(p);
+
+                        if(groupchats!==null||undefined){
+                            groupchatsArray = JSON.parse(groupchats);
+                        
+                            chats.forEach(chat=>{
+                                groupchatsArray.push(chat);
+                            });
+                            groupchats=JSON.stringify(groupchatsArray);
+                        }
+                        else{
+                            groupchats=JSON.stringify(chats)
+                        }
+                        localStorage.setItem(`groupchats${groupId}`, groupchats);
+                        
+                    });
+                    }
+                    // console.log(oldchats);
+                   // console.log(response.data.allChats);
+            })
+            .catch(err=>{
+                console.log(err);
+            })
+        }, 5000);
+    }
+
+        chatForm.addEventListener('submit', onSendChat);
+
+        function onSendChat(e){
+            e.preventDefault();
+            const groupid = newChatBtn.value;
+            // console.log(newChatBtn)
+            let obj={
+                message: newMessage.value,
+                groupid: groupid
+            }
+            console.log(obj);
+
+            axios.post('http://localhost:3000/group/postchat', obj, {headers: {"Authorization": token}})
+            .then(response=>{
+                console.log(response);
+            })
+            .catch(err=>{
+                console.log(err);
+            })
+
+        }
+
+    </script>
+</body>
+</html>

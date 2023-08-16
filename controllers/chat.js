@@ -1,10 +1,9 @@
-const { where, Op } = require('sequelize');
 const Chat = require('../models/chats');
 const User = require('../models/userdetails');
 
 exports.postUserChats = async(req, res)=>{
     try{
-        const userId = req.user.userId;
+        const userId = req.user.id;
         const date = new Date();
         const message = req.body.message;
         await Chat.create({
@@ -28,7 +27,7 @@ exports.getChats = async(req, res)=>{
         // chats.forEach(chat => {
         //     messages.push(chat.message);
         // });
-        console.log(chats);
+        // console.log(chats);
         res.status(201).json({success: true, allChats: chats})
     }
     catch(err){

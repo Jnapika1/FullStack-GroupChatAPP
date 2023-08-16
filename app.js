@@ -7,6 +7,8 @@ const cors = require('cors');
 
 const User = require('./models/userdetails');
 const Chats = require('./models/chats');
+const Group = require('./models/groups');
+const UserGroup = require('./models/usergroup');
 
 const app = express();
 
@@ -22,6 +24,12 @@ app.use(userRoutes);
 
 User.hasMany(Chats);
 Chats.belongsTo(User);
+
+Group.hasMany(Chats);
+Chats.belongsTo(Group);
+
+User.belongsToMany(Group, {through: UserGroup});
+Group.belongsToMany(User, {through: UserGroup});
 
 sequelize.sync()
 .then(result=>{

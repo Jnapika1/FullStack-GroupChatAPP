@@ -8,12 +8,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <style>
         #form-div{
-            position: fixed;
+            position:fixed;
             bottom: 0;
-            left: 0;
             right: 0;
-            width: 100%;
-            padding: 1.5% 0;
+            width: 70%;
+            padding: 1% 0;
             background-color: rgb(16, 49, 78);
         }
         form{
@@ -34,18 +33,23 @@
     </style>
 </head>
 <body>
-    <div>
-        <h3  class="text-center">Chat App</h3>
+    <div style="float: left; width: 30%;">
+
+    </div>
+    <div style="float: right; width: 70%;">
+        <h3 style="display:inline-block;" class="text-center">Chat App</h3>
+        <a href="./creategroup.html"><button id="create-group" class="btn btn-sm btn-success" style="float: right;">Create Group</button></a>
         <div id="chat-div">
             <p>You joined</p>
         </div>
         
-    </div>
+    
     <div class="rounded-top" id="form-div">
         <form id="chat-form">
             <input type="text" placeholder="Enter message" id="message" class="border border-primary" >
             <button type="submit" class="btn btn-sm btn-secondary">Send</button>
         </form>
+    </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js" crossorigin="anonymous" ></script>
@@ -66,49 +70,57 @@
             else{
                 oldchatsArray = JSON.parse(oldchats);
                 lastChatId = (oldchatsArray[oldchatsArray.length-1]).id;
-
                 await oldchatsArray.forEach(chat => {
                 let p = document.createElement('p');
                 p.appendChild(document.createTextNode(chat.message));
                 chatDiv.appendChild(p);
                 });
-            }
-            
-
-            
-            axios.get(`http://localhost:3000/user/getchats?lastchatid=${lastChatId}`)
-            .then(response=>{
                 
-                let chats = response.data.allChats;
-                // chats.forEach(chat => {
-                //     let p = document.createElement('p');
-                //     p.appendChild(document.createTextNode(chat));
-                //     chatDiv.appendChild(p);
-                    
-                // });
-                // console.log(oldchats);
-                if(oldchats!==null||undefined){
-                    oldchatsArray = JSON.parse(oldchats);
-                    chats.forEach(chat=>{
-                        oldchatsArray.push(chat);
-                    });
-                    oldchats=JSON.stringify(oldchatsArray);
+            }
+                        
+            setInterval(()=>{
+                oldchats = localStorage.getItem('oldchats');
+                if(oldchats===null){
+                    lastChatId=-1;
                 }
                 else{
-                    oldchats=JSON.stringify(chats)
+                    oldchatsArray = JSON.parse(oldchats);
+                    lastChatId = (oldchatsArray[oldchatsArray.length-1]).id;    
                 }
-                localStorage.setItem('oldchats', oldchats);
+                axios.get(`http://localhost:3000/user/getchats?lastchatid=${lastChatId}`, {headers: {"Authorization": token}})
+                .then(response=>{
                 
-                console.log(response.data.allChats);
+                    let chats = response.data.allChats;
+                    if(chats.length!==0){
+                        chats.forEach(chat => {
+                        let p = document.createElement('p');
+                        p.appendChild(document.createTextNode(chat.message));
+                        chatDiv.appendChild(p);
 
-            })
-            .catch(err=>{
-                console.log(err);
-            })
-            // setTimeout(()=>{
-            //     location.reload()
-            // }, 5000);
+                        if(oldchats!==null||undefined){
+                            oldchatsArray = JSON.parse(oldchats);
+                        
+                            chats.forEach(chat=>{
+                                oldchatsArray.push(chat);
+                            });
+                            oldchats=JSON.stringify(oldchatsArray);
+                        }
+                        else{
+                            oldchats=JSON.stringify(chats)
+                        }
+                        localStorage.setItem('oldchats', oldchats);
+                        
+                    });
+                    }
+                    // console.log(oldchats);
+                   // console.log(response.data.allChats);
+                })
+                .catch(err=>{
+                    console.log(err);
+                })
+            }, 5000);
         })
+        
 
         chatForm.addEventListener('submit', onSubmit);
 
@@ -125,8 +137,8 @@
             axios.post('http://localhost:3000/user/chat', obj, {headers: {"Authorization": token}})
             .then(response=>{
                 console.log(response);
-                location.reload();
-                alert(response.data.message);
+                // location.reload();
+                // alert(response.data.message);
                
             })
             .catch(err=>{
