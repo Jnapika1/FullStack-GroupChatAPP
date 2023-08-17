@@ -10,7 +10,7 @@ const Chat = sequelize.define('chat', {
         primaryKey: true
       },
     message: Sequelize.STRING,
-    date: Sequelize.DATE
+    username: Sequelize.STRING
 })
 
 module.exports = Chat;
