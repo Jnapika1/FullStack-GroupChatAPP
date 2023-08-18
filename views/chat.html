@@ -87,7 +87,7 @@
                     oldchatsArray = JSON.parse(oldchats);
                     lastChatId = (oldchatsArray[oldchatsArray.length-1]).id;    
                 }
-                axios.get(`http://localhost:3000/user/getchats?lastchatid=${lastChatId}`, {headers: {"Authorization": token}})
+                axios.get(`http://35.154.54.17:3000/user/getchats?lastchatid=${lastChatId}`, {headers: {"Authorization": token}})
                 .then(response=>{
                 
                     let chats = response.data.allChats;
@@ -134,7 +134,7 @@
                     message:message.value
                 }
             }
-            axios.post('http://localhost:3000/user/chat', obj, {headers: {"Authorization": token}})
+            axios.post('http://35.154.54.17:3000/user/chat', obj, {headers: {"Authorization": token}})
             .then(response=>{
                 console.log(response);
                 // location.reload();

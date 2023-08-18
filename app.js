@@ -22,6 +22,12 @@ app.use(cors({
 
 app.use(userRoutes);
 
+app.use((req, res)=>{
+    console.log('url', req.url);
+	// res.setHeader("Content-Security-Policy-Report-Only", "default-src 'self' script-src 'self'; img-src 'self'; style-src 'self';base-uri 'self';form-action 'self'");
+    res.sendFile(path.join(__dirname, `views/${req.url}`));
+})
+
 User.hasMany(Chats);
 Chats.belongsTo(User);
 

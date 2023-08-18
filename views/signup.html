@@ -59,7 +59,7 @@
                 }
                 // console.log(myObj);
                 
-                axios.post('http://localhost:3000/user/signup', myObj)
+                axios.post('http://35.154.54.17:3000/user/signup', myObj)
                 .then(response=>{
                     p.style.color='green';
                     p.textContent=`${response.data.message}`;

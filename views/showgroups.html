@@ -98,7 +98,7 @@
         const newMessage = document.getElementById('message');
 
         window.addEventListener('DOMContentLoaded', ()=>{
-            axios.get('http://localhost:3000/user/getgroups', {headers: {"Authorization": token}})
+            axios.get('http://35.154.54.17:3000/user/getgroups', {headers: {"Authorization": token}})
             .then(response=>{
                 // console.log(response.data.groups);
                 let groups = response.data.groups;
@@ -155,7 +155,7 @@
                 }
 
             // console.log(groupdiv);
-            axios.get(`http://localhost:3000/group/getchats?groupid=${groupId}&lastchatid=${lastChatId}`, {headers: {"Authorization": token}})
+            axios.get(`http://35.154.54.17:3000/group/getchats?groupid=${groupId}&lastchatid=${lastChatId}`, {headers: {"Authorization": token}})
             .then(response=>{
                 // console.log(response);
                 let chats = response.data.groupChats;
@@ -201,7 +201,7 @@
             }
             console.log(obj);
 
-            axios.post('http://localhost:3000/group/postchat', obj, {headers: {"Authorization": token}})
+            axios.post('http://35.154.54.17:3000/group/postchat', obj, {headers: {"Authorization": token}})
             .then(response=>{
                 console.log(response);
                 // location.reload();
