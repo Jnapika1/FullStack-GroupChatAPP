@@ -63,7 +63,7 @@
                 .then(response=>{
                     p.style.color='green';
                     p.textContent=`${response.data.message}`;
-                    window.location.replace('../views/login.html');
+                    window.location.replace('./login.html');
                     // console.log(response);
                 })
                 .catch((err)=>{
