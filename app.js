@@ -11,6 +11,8 @@ const Group = require('./models/groups');
 const UserGroup = require('./models/usergroup');
 
 const app = express();
+const dotenv = require('dotenv');
+dotenv.config();
 
 app.use(bodyParser.json({ extended: false }));
 app.use(express.static(path.join(__dirname, 'views')));

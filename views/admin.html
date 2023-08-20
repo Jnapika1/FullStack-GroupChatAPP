@@ -44,7 +44,7 @@
 
         window.addEventListener('DOMContentLoaded', ()=>{   
             console.log(groupId);
-            axios.get(`http://35.154.54.17:3000/group/getgroupusers?groupid=${groupId}`, {headers: {"Authorization": token}})
+            axios.get(`http://13.232.143.254:3000/group/getgroupusers?groupid=${groupId}`, {headers: {"Authorization": token}})
             .then(response=>{
                 console.log(response);
                 let users = response.data.users;
@@ -81,7 +81,7 @@
                     groupId: groupId
                 }
                 console.log(obj);
-                axios.post('http://35.154.54.17:3000/group/deleteuser', obj, {headers: {"Authorization": token}})
+                axios.post('http://13.232.143.254:3000/group/deleteuser', obj, {headers: {"Authorization": token}})
                 .then(response=>{
                     console.log(response);
                     if(response.status===201||203)
@@ -110,7 +110,7 @@
                     userId : userId,
                     groupId: groupId
                 }
-                axios.post('http://35.154.54.17:3000/group/makeadmin', obj, {headers: {"Authorization": token}})
+                axios.post('http://13.232.143.254:3000/group/makeadmin', obj, {headers: {"Authorization": token}})
                 .then(response=>{
                     console.log(response);
                 })
@@ -134,7 +134,7 @@
         function addUsers(){
         
         // get users other than users in group
-            axios.get(`http://35.154.54.17:3000/group/getuserstoadd?groupid=${groupId}`, {headers: {"Authorization": token}})
+            axios.get(`http://13.232.143.254:3000/group/getuserstoadd?groupid=${groupId}`, {headers: {"Authorization": token}})
             .then(response=>{
                 console.log(response);
                 if(response.status===202){
@@ -175,7 +175,7 @@
                         groupid: groupId,
                         users: selectedUsers
                     }
-                    axios.post('http://35.154.54.17:3000/group/addtogroup', obj, {headers: {"Authorization": token}})
+                    axios.post('http://13.232.143.254:3000/group/addtogroup', obj, {headers: {"Authorization": token}})
                     .then(response=>{
                         console.log(response);
                         location.reload();

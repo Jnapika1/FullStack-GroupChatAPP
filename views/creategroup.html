@@ -24,7 +24,7 @@
         const token = localStorage.getItem('tokenKey');
 
         window.addEventListener('DOMContentLoaded', ()=>{
-            axios.get('http://35.154.54.17:3000/group/getusers', {headers: {"Authorization": token}})
+            axios.get('http://13.232.143.254:3000/group/getusers', {headers: {"Authorization": token}})
             .then(response=>{
                 console.log(response.data.users);
                 let users = response.data.users;
@@ -63,7 +63,7 @@
                 groupname: groupName.value,
                 users: selectedUsers
             }
-            axios.post('http://35.154.54.17:3000/group/creategroup', obj, {headers: {"Authorization": token}})
+            axios.post('http://13.232.143.254:3000/group/creategroup', obj, {headers: {"Authorization": token}})
             .then(response=>{
                 console.log(response);
                 window.location.replace('./showgroups.html');
