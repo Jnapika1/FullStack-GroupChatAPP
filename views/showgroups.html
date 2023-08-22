@@ -26,6 +26,7 @@
             padding: 2% 2%;
             border-left: 2px solid rgb(196, 196, 196);
             height: 100%;
+            overflow: scroll;
         }
         #form-div{
             position:fixed;
@@ -88,7 +89,9 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js" crossorigin="anonymous" ></script>
+    <script src="../socket.io/socket.io.js"></script>
     <script>
+        const socket = io();
         const token= localStorage.getItem('tokenKey')
         const groupsDiv = document.getElementById('groups');
         const groupdiv = document.getElementById('groupchat-div');
@@ -121,12 +124,18 @@
             
         })
 
+       
+
         async function getChats(groupId, groupName){
+
+            socket.emit('joinGroup', groupId);
+
             document.getElementById('showUsers').href=`./admin.html?groupid=${groupId}`
             document.getElementById('addUsers').href=`./admin.html?groupid=${groupId}`
 
             chatDiv.innerHTML="";
             document.getElementById('gc-h3').innerText= groupName;
+            chatDiv.id=groupId;
             newChatBtn.value=groupId;
 
             let groupchatsArray, lastChatId;
@@ -145,49 +154,55 @@
                 });    
             }
 
-            setInterval(()=>{
-                if(groupchats===null){
-                    lastChatId=-1;
-                }
-                else{
-                    groupchatsArray = JSON.parse(groupchats);
-                    lastChatId = (groupchatsArray[groupchatsArray.length-1]).id;    
-                }
+            // setInterval(()=>{
 
             // console.log(groupdiv);
             axios.get(`http://localhost:3000/group/getchats?groupid=${groupId}&lastchatid=${lastChatId}`, {headers: {"Authorization": token}})
             .then(response=>{
                 // console.log(response);
+                groupchats = localStorage.getItem(`groupchats${groupId}`);
                 let chats = response.data.groupChats;
                     if(chats.length!==0){
                         chats.forEach(chat => {
                         let p = document.createElement('p');
                         p.appendChild(document.createTextNode(`${chat.username} : ${chat.message}`));
                         chatDiv.appendChild(p);
+                        })
 
-                        if(groupchats!==null||undefined){
+                        if(groupchats===null){
+                            groupchats=JSON.stringify(chats)
+                            console.log('if block=> ', groupchats)
+                        }
+                        else{
                             groupchatsArray = JSON.parse(groupchats);
                         
                             chats.forEach(chat=>{
                                 groupchatsArray.push(chat);
                             });
                             groupchats=JSON.stringify(groupchatsArray);
+                            console.log('if block=> ', groupchats);
                         }
-                        else{
-                            groupchats=JSON.stringify(chats)
-                        }
-                        localStorage.setItem(`groupchats${groupId}`, groupchats);
-                        
-                    });
-                    }
+                        localStorage.setItem(`groupchats${groupId}`, groupchats);   
+                    }                    
                     // console.log(oldchats);
                    // console.log(response.data.allChats);
             })
             .catch(err=>{
                 console.log(err);
             })
-        }, 3000);
-    }
+            
+            
+        // }, 3000);
+        }
+
+        socket.on('message', data=>{
+            if(chatDiv.id===data.groupId){
+                let p = document.createElement('p');
+                p.textContent=`${data.username} : ${data.message}`;
+                chatDiv.appendChild(p);
+            }
+            // console.log(data); 
+        })
 
         chatForm.addEventListener('submit', onSendChat);
 
@@ -200,6 +215,12 @@
                 groupid: groupid
             }
             console.log(obj);
+
+            socket.emit('newMessage', {
+                message: newMessage.value,
+                groupid: groupid,
+                token: token
+            });
 
             axios.post('http://localhost:3000/group/postchat', obj, {headers: {"Authorization": token}})
             .then(response=>{
