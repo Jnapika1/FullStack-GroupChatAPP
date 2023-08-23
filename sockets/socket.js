@@ -19,7 +19,19 @@ io.on('connection', (socket) => {
         // console.log(userFound.name);
         const username=userFound.name;
 
-        io.to(JSON.parse(data.groupid)).emit('message', {username: username, message:data.message, groupId: data.groupid});
+        if(!data.fileUrl){
+            io.to(JSON.parse(data.groupid)).emit('message', {username: username, message:data.message, groupId: data.groupid, isUrl: false});
+        }
+        else{
+            if(data.message){
+            io.to(JSON.parse(data.groupid)).emit('message', {username: username, message:data.message, groupId: data.groupid, isUrl: false});
+            }
+            
+            io.to(JSON.parse(data.groupid)).emit('message', {username: username, message:data.fileUrl, groupId: data.groupid, isUrl: true});
+            
+        }
+
+        
         // console.log('sending message to users', data.groupid, data.message);
     })
     // Handle events on the socket

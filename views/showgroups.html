@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Groups</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Option 1: Include in HTML -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <style>
         html, body{
             margin: 0%;
@@ -29,6 +31,8 @@
             overflow: scroll;
         }
         #form-div{
+            display: flex;
+            justify-content: center;
             position:fixed;
             bottom: 0;
             right: 0;
@@ -38,10 +42,7 @@
         }
         form{
             display: flex;
-            justify-content: center;
-        }
-        input{
-            width: 40%;
+            width: 70%;
             border: 0;
             border-radius: 5px;
         }
@@ -82,7 +83,8 @@
 
         <div class="rounded-top" id="form-div">
             <form id="chat-form">
-                <input type="text" placeholder="Enter message" id="message" class="border border-primary" >
+                <input type="text" placeholder="Enter message" id="message" class="form-control border border-primary" >
+                <input class="form-control form-control-sm" type="file" id="file">
                 <button type="submit" class="btn btn-sm btn-secondary" id="newchatBtn">Send</button>
             </form>
         </div>
@@ -99,6 +101,7 @@
         const chatForm = document.getElementById('chat-form');
         const newChatBtn = document.getElementById('newchatBtn');
         const newMessage = document.getElementById('message');
+        const newFile = document.getElementById('file');
 
         window.addEventListener('DOMContentLoaded', ()=>{
             axios.get('http://localhost:3000/user/getgroups', {headers: {"Authorization": token}})
@@ -148,8 +151,18 @@
                 groupchatsArray = JSON.parse(groupchats);
                 lastChatId = (groupchatsArray[groupchatsArray.length-1]).id;
                 await groupchatsArray.forEach(chat => {
-                let p = document.createElement('p');
-                p.appendChild(document.createTextNode(`${chat.username} : ${chat.message}`));
+                    let p = document.createElement('p');
+                            if(chat.isUrl){
+                                let a = document.createElement('a');
+                                a.href= chat.message
+                                const date = new Date().toISOString();
+                                a.textContent=`file${date}`;
+                                p.appendChild(document.createTextNode(`${chat.username} : `));
+                                p.appendChild(a);
+                            }
+                            else{
+                                p.appendChild(document.createTextNode(`${chat.username} : ${chat.message}`));
+                            }
                 chatDiv.appendChild(p);
                 });    
             }
@@ -164,8 +177,18 @@
                 let chats = response.data.groupChats;
                     if(chats.length!==0){
                         chats.forEach(chat => {
-                        let p = document.createElement('p');
-                        p.appendChild(document.createTextNode(`${chat.username} : ${chat.message}`));
+                            let p = document.createElement('p');
+                            if(chat.isUrl){
+                                let a = document.createElement('a');
+                                a.href= chat.message
+                                const date = new Date().toISOString();
+                                a.textContent=`file${date}`;
+                                p.appendChild(document.createTextNode(`${chat.username} : `));
+                                p.appendChild(a);
+                            }
+                            else{
+                                p.appendChild(document.createTextNode(`${chat.username} : ${chat.message}`));
+                            }
                         chatDiv.appendChild(p);
                         })
 
@@ -198,29 +221,73 @@
         socket.on('message', data=>{
             if(chatDiv.id===data.groupId){
                 let p = document.createElement('p');
-                p.textContent=`${data.username} : ${data.message}`;
+                if(data.isUrl){
+                    let a = document.createElement('a');
+                    a.href= data.message
+                    const date = new Date().toISOString();
+                    a.textContent=`file${date}`;
+                    p.appendChild(document.createTextNode(`${data.username} : `));
+                    p.appendChild(a);
+                }
+                else{
+                    p.appendChild(document.createTextNode(`${data.username} : ${data.message}`));
+                }
                 chatDiv.appendChild(p);
             }
             // console.log(data); 
         })
 
+
+        function readFileAsDataURL(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          
+          reader.onload = function(event) {
+            resolve(event.target.result);
+          };
+          
+          reader.onerror = function(error) {
+            reject(error);
+          };
+        
+          reader.readAsDataURL(file);
+        });
+      }
+
         chatForm.addEventListener('submit', onSendChat);
 
-        function onSendChat(e){
+        async function onSendChat(e){
             e.preventDefault();
             const groupid = newChatBtn.value;
-            // console.log(newChatBtn)
-            let obj={
-                message: newMessage.value,
-                groupid: groupid
-            }
-            console.log(obj);
-
-            socket.emit('newMessage', {
-                message: newMessage.value,
+            const file = newFile.files[0];
+            
+            const message = newMessage.value
+            let obj = {
                 groupid: groupid,
-                token: token
-            });
+            }
+            if(file===undefined){
+                if(message===''){
+                    alert("Enter a message or select a file to Send message!");
+                }
+                else{
+                    obj.message=message;
+                }
+            }
+            else {
+                const filetype = file.type
+                obj.fileUrl=await readFileAsDataURL(file);
+                obj.filetype = filetype;
+                if(message!==''){
+                    obj.message=message;
+                }
+                
+            }
+            
+            // console.log(newChatBtn)
+            console.log(obj);
+            let obj1 ={...obj, token: token};
+
+            socket.emit('newMessage', obj1);
 
             axios.post('http://localhost:3000/group/postchat', obj, {headers: {"Authorization": token}})
             .then(response=>{

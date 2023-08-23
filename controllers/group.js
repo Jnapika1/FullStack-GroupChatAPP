@@ -3,6 +3,7 @@ const User = require('../models/userdetails');
 const Chat = require('../models/chats');
 const { Op } = require('sequelize');
 const UserGroup = require('../models/usergroup');
+const S3Services = require('../services/s3services');
 
 exports.getUsers = async(req, res)=>{
     try{
@@ -128,16 +129,51 @@ exports.postGroupChats = async(req, res)=>{
     try{
         const groupId = req.body.groupid;
         const message = req.body.message;
+        const fileUrl = req.body.fileUrl;
+        const filetype = req.body.filetype;
         const userId = req.user.id;
+        // console.log(req.body.message);
         const username = (await User.findByPk(userId)).name;
-    
-    await Chat.create({
-        message:message,
-        username: username,
-        userId: userId,
-        groupId: groupId
-    })
-    res.status(201).json({success: true, message: "chat stored successfully!"});
+
+        if(!req.body.fileUrl){
+            await Chat.create({
+                message:message,
+                username: username,
+                userId: userId,
+                groupId: groupId,
+                isUrl : false
+            })
+        }
+        else{
+            if(req.body.message){
+                await Chat.create({
+                    message:message,
+                    username: username,
+                    userId: userId,
+                    groupId: groupId,
+                    isUrl : false
+                })
+                
+            }
+            
+
+            const date = new Date().toISOString();
+            const filename = `File${date}`
+
+            const filebuffer = Buffer.from(fileUrl.split(',')[1], 'base64');
+            const S3fileurl = await S3Services.uploadToS3(filebuffer, filename, filetype)
+
+            await Chat.create({
+                message: S3fileurl,
+                username: username,
+                userId: userId,
+                groupId: groupId,
+                isUrl : true
+            })
+        
+            
+        }
+        res.status(201).json({success: true, message: "chat stored successfully!"});
     }
     catch(err){
         console.log(err);

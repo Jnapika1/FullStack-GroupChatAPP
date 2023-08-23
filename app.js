@@ -18,7 +18,7 @@ const app = express();
 const server = http.createServer(app); // Create an http server
 const io = socketIo(server);
 
-app.use(bodyParser.json({ extended: false }));
+app.use(bodyParser.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'views')));
 
 app.use(cors({
