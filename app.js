@@ -4,8 +4,13 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const sequelize = require('./util/database');
 const userRoutes = require('./routers/userRoutes');
+const groupRoutes = require('./routers/groupRoutes');
+const adminRoutes = require('./routers/adminRoutes');
 const cors = require('cors');
 const socketIo = require('socket.io');
+// require('cron');
+
+const cronJob = require('./controllers/cronJob');
 
 
 const User = require('./models/userdetails');
@@ -26,7 +31,8 @@ app.use(cors({
     // methods: ['GET', 'POST']
 }));
 
-app.use(userRoutes);
+// app.use(userRoutes);
+app.use(adminRoutes, groupRoutes, userRoutes);
 
 User.hasMany(Chats);
 Chats.belongsTo(User);

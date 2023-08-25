@@ -6,16 +6,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Group</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        #creategroup-div{
+            margin: 2% 20%;
+            padding: 2% 5%;
+            border: 2px solid rgb(25, 102, 59);
+            border-radius: 10px;
+        }
+        #users-div{
+            margin: 2% 0 2% 0;
+        }
+        .btn{
+            margin: 2% 2% 2% 0;
+        }
+    </style>
 </head>
 <body>
-    <form id="group-form">
-        <label for="groupname" class="form-label">Group Name:</label>
-        <input type="text" name="groupname" id="groupname" placeholder="Group Name" class="form-control" required>
-        <div id="users-div">
+    <div id="creategroup-div">
+        <a href="./showgroups.html"><button class="btn btn-warning btn-sm">Back</button></a>
+        <form id="group-form">
+            <label for="groupname" class="form-label">Group Name:</label>
+            <input type="text" name="groupname" id="groupname" placeholder="Group Name" class="form-control" required>
+            <div id="users-div">
 
-        </div>
-        <button type="submit" class="btn btn-sm btn-success">Create</button>
-    </form>
+            </div>
+            <button type="submit" class="btn btn-sm btn-success">Create</button>
+        </form>
+    </div>
+    
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js" crossorigin="anonymous" ></script>
     <script>
@@ -34,7 +52,10 @@
                     userSelect.type="checkbox";
                     userSelect.name="user";
                     userSelect.value= `${user.id}`;
+                    userSelect.className="form-check-input"
                     userLabel.for="user";
+                    userLabel.className="form-check-label"
+
                     userLabel.appendChild(document.createTextNode(`${user.name}`));
                     usersDiv.appendChild(userSelect);
                     usersDiv.appendChild(userLabel);
@@ -72,9 +93,6 @@
                 console.log(err);
             })
         }
-
-
-
     </script>
 </body>
 </html>
